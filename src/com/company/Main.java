@@ -11,45 +11,85 @@ import java.io.InputStreamReader;
 
 public class Main {
 
-    //ln 44
-
     private static File myFile = new File("Library.txt");
+    private static File myFile2 = new File("Username/Passwords.txt");
 
     public static void main(String[] args) throws IOException {
         createFile();
+        createFile2();
+        Loginsystem();
         MenuChoice();
-        Scanner input = new Scanner(System.in);
-        WriteToFile();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String line = br.readLine();
-        switch (line){
-            case "":
-                System.out.println();
-                break;
-        }
-        while(true){
-            System.out.println("Do you wish to register another book? (Y/N)");
-            String check = input.next();
-            if(check.contains("Y")||check.contains("y")){
-                WriteToFile();
-            }else if(check.contains("N")||check.contains("n")){
-                break;
-            }
-
-        }
+        RegisterAnotherBook();
     }
 
-    public static int MenuChoice() {
-        Scanner input = new Scanner(System.in);// Finish Menu with search and finish search use Read Method.
+    public static void Register(){
+        System.out.println("");
+    }
+
+    public static void Loginsystem(){
         try {
-            System.out.println("Welcome to the library, What would you like to do?" +
-                    "1. Register a book" +
+            System.out.println("Would you like to Register or Log In?" + "\n" +
+                    "1. Register" + "\n" +
+                    "2 . Log In");
+            int userchoice = 0;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            String line = br.readLine();
+            switch (line){
+                case "1":
+                    userchoice = 1;
+                    break;
+                case "2":
+                    userchoice = 2;
+                    break;
+            }
+            if(userchoice == 1){
+                Register();
+            } else if(userchoice == 2) {
+                LogIn();
+            }
+        }catch (InputMismatchException e){
+
+        }
+
+    }
+
+    public static void RegisterAnotherBook(){
+            Scanner input = new Scanner(System.in);
+            while(true){
+                System.out.println("Do you wish to register another book? (Y/N)");
+                String check = input.next();
+                if(check.contains("Y")||check.contains("y")){
+                    WriteToFile();
+                }else if(check.contains("N")||check.contains("n")){
+                    break;
+                }
+
+            }
+        }
+
+    public static void MenuChoice() throws IOException {
+        int userchoice = 0;
+        try {
+            System.out.println("Welcome to the library, What would you like to do?" + "\n" +
+                    "1. Register a book" + "\n" +
                     "2. Search for a book");
-            int userchoice = input.nextInt();
-            return userchoice;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            String line = br.readLine();
+            switch (line){
+                case "1":
+                    userchoice = 1;
+                    break;
+                case "2":
+                    userchoice = 2;
+                    break;
+            }
+            if(userchoice == 1){
+                WriteToFile();
+            } else if(userchoice == 2) {
+                ReadFile();
+            }
         }catch (InputMismatchException e){
             System.out.println(e);
-            return -1;
         }
     }
 
@@ -71,12 +111,28 @@ public class Main {
         }
     }
 
+    public static String Search() throws IOException {
+        System.out.println("Please input ISBN");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = br.readLine();
+        return line;
+    }
+
     public static void createFile(){
         try {
             if (myFile.createNewFile()) {
                 System.out.println("File created: " + myFile.getName());
-            } else {
-                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void createFile2(){
+        try {
+            if (myFile.createNewFile()) {
+                System.out.println("File created: " + myFile2.getName());
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
@@ -96,13 +152,12 @@ public class Main {
         }
     }
 
-    public static void ReadFile(){
+    public static void ReadFile() throws IOException {
         try {
             Scanner myReader = new Scanner(myFile);
-            System.out.println("Here are the Students with e or u in their name: ");
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
-                if(data.contains("e")|| data.contains("u")){
+                if(data.contains(Search())|| data.contains(Search())){
                     System.out.println(data);
                 }
             }
