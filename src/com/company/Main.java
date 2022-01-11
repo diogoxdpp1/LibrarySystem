@@ -11,61 +11,133 @@ import java.io.InputStreamReader;
 
 public class Main {
 
-    private static File myFile = new File("Library.txt");
-    private static File myFile2 = new File("Username/Passwords.txt");
+    private static final File myFile = new File("Library.txt");
+    private static final File myFile2 = new File("UsernamePasswords.txt");
+    private static Scanner input = new Scanner(System.in);
 
-    public static void main(String[] args) throws IOException {
-        createFile();
-        createFile2();
-        Loginsystem();
-        MenuChoice();
-        RegisterAnotherBook();
+    public static void main(String[] args) {
+        createFile(myFile);
+        createFile(myFile2);
+        LoginSystem();
     }
 
     public static void Register(){
-        System.out.println("");
+        boolean check = false;
+        boolean isNumber = false;
+        boolean isUpper = false;
+        boolean allCorrect = false;
+        String uName = "";
+        String uNamenPass = "";
+        Scanner input = new Scanner(System.in);
+        while(!check) {
+            try {
+                System.out.println("Please input your username (has to have a number)");
+                while(!isNumber) {
+                    uName = input.next();
+                    char[] userName = new char[uName.length()];
+
+                    for (int i = 0; i < uName.length(); i++) {
+                        userName[i] = uName.charAt(i);
+                    }
+                    for (int i = 0; i < userName.length; i++) {
+                        if (Character.isDigit(userName[i])) {
+                            isNumber = true;
+                            check = true;
+                        }
+                    }
+                    if(!isNumber){
+                        System.out.println("Please have a number in ur username");
+                    }
+                }
+                if (isNumber) {
+                    System.out.println("Please input a password (must contain a Capital letter)");
+                    while (!isUpper) {
+                        String uPassword = input.next();
+                        char[] userPassword = new char[uPassword.length()];
+                        for (int i = 0; i < uPassword.length(); i++) {
+                            userPassword[i] = uPassword.charAt(i);
+                        }
+                        for (int i = 0; i < userPassword.length; i++) {
+                            if (Character.isUpperCase(userPassword[i])) {
+                                isUpper = true;
+                                check = true;
+                            }
+                        }
+                        if (!isUpper) {
+                            System.out.println("Please Have a capital letter in your password");
+                        }
+                        if (isNumber && isUpper) {
+                            allCorrect = true;
+                        }
+                        if (allCorrect) {
+                            uNamenPass = uName + "," + uPassword;
+                            WriteToFile(uNamenPass, myFile2);
+                        }
+                        check = true;
+                    }
+                }
+            } catch (InputMismatchException e) {
+                System.out.println(e);
+            }
+        }
     }
 
-    public static void Loginsystem(){
+    public static void LogIn() throws IOException {
+        boolean uName = false;
+        System.out.println("Please input your username");
+        try {
+            String userName = input.next();
+            System.out.println("Please input your password.");
+            String userPassword = input.next();
+            if (ReadFile(userName+","+userPassword, myFile2)) {
+                uName = true;
+            }else{
+                if (ReadFile(userName, myFile2)){
+                    System.out.println("Your password does not match the username");
+                }else{
+                    System.out.println("We do not have that username on record.");
+                }
+            }
+            if(uName == true){
+                MenuChoice();
+            }
+        }catch (InputMismatchException e){
+            System.out.println(e);
+        }
+    }
+
+    public static void LoginSystem(){
         try {
             System.out.println("Would you like to Register or Log In?" + "\n" +
                     "1. Register" + "\n" +
-                    "2 . Log In");
-            int userchoice = 0;
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            String line = br.readLine();
-            switch (line){
-                case "1":
-                    userchoice = 1;
-                    break;
-                case "2":
-                    userchoice = 2;
-                    break;
-            }
+                    "2  Log In");
+            int userchoice = input.nextInt();
             if(userchoice == 1){
                 Register();
             } else if(userchoice == 2) {
                 LogIn();
+            }else{
+                System.out.println("a");
             }
-        }catch (InputMismatchException e){
-
+        }catch (InputMismatchException | IOException e){
+            System.out.println("e");
         }
 
     }
 
     public static void RegisterAnotherBook(){
-            Scanner input = new Scanner(System.in);
-            while(true){
-                System.out.println("Do you wish to register another book? (Y/N)");
-                String check = input.next();
-                if(check.contains("Y")||check.contains("y")){
-                    WriteToFile();
-                }else if(check.contains("N")||check.contains("n")){
-                    break;
-                }
-
+        Scanner input = new Scanner(System.in);
+        while(true){
+            System.out.println("Do you wish to register another book? (Y/N)");
+            String check = input.next();
+            if(check.contains("Y")||check.contains("y")){
+                WriteToFile(bookDetails() , myFile);
+            }else if(check.contains("N")||check.contains("n")){
+                break;
             }
+
         }
+    }
 
     public static void MenuChoice() throws IOException {
         int userchoice = 0;
@@ -84,9 +156,9 @@ public class Main {
                     break;
             }
             if(userchoice == 1){
-                WriteToFile();
+                WriteToFile(bookDetails() , myFile);
             } else if(userchoice == 2) {
-                ReadFile();
+                Search();
             }
         }catch (InputMismatchException e){
             System.out.println(e);
@@ -111,17 +183,17 @@ public class Main {
         }
     }
 
-    public static String Search() throws IOException {
+    public static void Search() throws IOException {
         System.out.println("Please input ISBN");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String line = br.readLine();
-        return line;
+        Scanner scanner = new Scanner(System.in);
+        String ISBN = scanner.next();
+        ReadFile(ISBN , myFile);
     }
 
-    public static void createFile(){
+    public static void createFile(File fileName){
         try {
-            if (myFile.createNewFile()) {
-                System.out.println("File created: " + myFile.getName());
+            if (fileName.createNewFile()) {
+                System.out.println("File created: " + fileName.getName());
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
@@ -129,21 +201,10 @@ public class Main {
         }
     }
 
-    public static void createFile2(){
+    public static void WriteToFile(String informationToWrite, File fileToWriteTo) {
         try {
-            if (myFile.createNewFile()) {
-                System.out.println("File created: " + myFile2.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-    }
-
-    public static void WriteToFile() {
-        try {
-            FileWriter myWriter = new FileWriter(myFile.getName(), true); //True means append to file contents, False means overwrite
-            myWriter.write(bookDetails() + "\n");
+            FileWriter myWriter = new FileWriter(fileToWriteTo.getName(), true); //True means append to file contents, False means overwrite
+            myWriter.write(informationToWrite + "\n");
             myWriter.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
@@ -152,13 +213,18 @@ public class Main {
         }
     }
 
-    public static void ReadFile() throws IOException {
+    public static boolean ReadFile(String SearchPara, File fileToRead) throws IOException {
+        boolean a = false;
         try {
-            Scanner myReader = new Scanner(myFile);
+            Scanner myReader = new Scanner(fileToRead);
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
-                if(data.contains(Search())|| data.contains(Search())){
-                    System.out.println(data);
+                if(data.contains(SearchPara)|| data.contains(SearchPara)){
+                    a = true;
+                    return a;
+                }else {
+                    a = false;
+                    return a;
                 }
             }
             myReader.close();
@@ -166,5 +232,8 @@ public class Main {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+        System.out.println(a);
+        a = false;
+        return a;
     }
 }
