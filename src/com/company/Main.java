@@ -15,7 +15,7 @@ public class Main {
     private static final File myFile2 = new File("UsernamePasswords.txt");
     private static Scanner input = new Scanner(System.in);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         createFile(myFile);
         createFile(myFile2);
         LoginSystem();
@@ -99,7 +99,7 @@ public class Main {
                 }
             }
             if(uName == true){
-                MenuChoice();;
+                MenuChoice();
             }
         }catch (InputMismatchException e){
             System.out.println(e);
@@ -221,9 +221,6 @@ public class Main {
                 String data = myReader.nextLine();
                 if(data.contains(SearchPara)|| data.contains(SearchPara)){
                     a = true;
-                    return a;
-                }else {
-                    a = false;
                     return a;
                 }
             }
