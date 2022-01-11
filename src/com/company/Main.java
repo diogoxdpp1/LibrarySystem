@@ -99,7 +99,7 @@ public class Main {
                 }
             }
             if(uName == true){
-                MenuChoice();
+                MenuChoice();;
             }
         }catch (InputMismatchException e){
             System.out.println(e);
