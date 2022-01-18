@@ -1,2 +1,2 @@
 
-(Error)
+Book: Name = 'Hah', ISBN = 1231, Author = 'fadfa', Genre = 'fa'}

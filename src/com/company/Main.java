@@ -16,9 +16,14 @@ public class Main {
     private static Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
-        createFile(myFile);
-        createFile(myFile2);
-        LoginSystem();
+        boolean check = false;
+                while(check){
+                    if(LoginSystem()){
+                        MenuChoice();
+                    }else{
+                        System.out.println("please try again");
+                    }
+                }
     }
 
     public static void Register(){
@@ -82,16 +87,18 @@ public class Main {
         }
     }
 
-    public static void LogIn() throws IOException {
+    public static boolean LogIn() throws IOException {
         boolean uName = false;
         System.out.println("Please input your username");
         try {
             String userName = input.next();
             System.out.println("Please input your password.");
             String userPassword = input.next();
-            if (ReadFile(userName+","+userPassword, myFile2)) {
+            String SearchPara = userName + "," + userPassword;
+            if (ReadFile(SearchPara, myFile2)) {
                 uName = true;
             }else{
+
                 if (ReadFile(userName, myFile2)){
                     System.out.println("Your password does not match the username");
                 }else{
@@ -99,14 +106,17 @@ public class Main {
                 }
             }
             if(uName == true){
+                return true;
                 MenuChoice();
+            }else{
+                return false;
             }
         }catch (InputMismatchException e){
             System.out.println(e);
         }
     }
 
-    public static void LoginSystem(){
+    public static boolean LoginSystem(){
         try {
             System.out.println("Would you like to Register or Log In?" + "\n" +
                     "1. Register" + "\n" +
@@ -115,11 +125,17 @@ public class Main {
             if(userchoice == 1){
                 Register();
             } else if(userchoice == 2) {
-                LogIn();
+                if(LogIn()){
+                    return true;
+                }else{
+                    return false;
+                }
             }else{
-                System.out.println("a");
+                System.out.println("Please only input 1 or 2");
+                return false;
             }
         }catch (InputMismatchException | IOException e){
+            return false;
             System.out.println("e");
         }
 
@@ -158,7 +174,11 @@ public class Main {
             if(userchoice == 1){
                 WriteToFile(bookDetails() , myFile);
             } else if(userchoice == 2) {
-                Search();
+                if(Search()){
+                    System.out.println("This book is in the file");
+                }else{
+                    System.out.println("Book is not in the file");
+                }
             }
         }catch (InputMismatchException e){
             System.out.println(e);
@@ -176,18 +196,23 @@ public class Main {
             String author = input.next();
             System.out.println("Please write the genre: ");
             String genre = input.next();
-            return (bookName + "," + ISBN + "," + author + "," + genre);
+            Book book = new Book(bookName, ISBN, author, genre);
+            return book.toString();
         } catch (InputMismatchException e){
             System.out.print("Error: " + e);
-            return "(Error)";
+            return null;
         }
     }
 
-    public static void Search() throws IOException {
+    public static boolean Search() throws IOException {
         System.out.println("Please input ISBN");
         Scanner scanner = new Scanner(System.in);
         String ISBN = scanner.next();
-        ReadFile(ISBN , myFile);
+        if (ReadFile(ISBN, myFile)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public static void createFile(File fileName){
