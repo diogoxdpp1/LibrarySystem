@@ -17,13 +17,26 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         boolean check = false;
-                while(check){
-                    if(LoginSystem()){
-                        MenuChoice();
+
+        if (LoginSystem()) {
+            while (!check) {
+                System.out.println("Would you like to use the library (1 = yes /2 = no)");
+                try {
+                    int uInp = input.nextInt();
+                    if (uInp == 1){
+                        check = false;
                     }else{
-                        System.out.println("please try again");
+                        System.out.println("Have a nice day!");
+                        check = true;
                     }
+                }catch (InputMismatchException e ){
+                    System.out.println(e);
                 }
+                MenuChoice();
+            }
+        } else {
+            System.out.println("please try again");
+        }
     }
 
     public static void Register(){
@@ -107,12 +120,13 @@ public class Main {
             }
             if(uName == true){
                 return true;
-                MenuChoice();
             }else{
                 return false;
             }
         }catch (InputMismatchException e){
             System.out.println(e);
+            return false;
+
         }
     }
 
@@ -135,10 +149,10 @@ public class Main {
                 return false;
             }
         }catch (InputMismatchException | IOException e){
-            return false;
             System.out.println("e");
+            return false;
         }
-
+        return false;
     }
 
     public static void RegisterAnotherBook(){
@@ -160,7 +174,8 @@ public class Main {
         try {
             System.out.println("Welcome to the library, What would you like to do?" + "\n" +
                     "1. Register a book" + "\n" +
-                    "2. Search for a book");
+                    "2. Search for a book" + "\n" +
+                    "3. Edit an existing book");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             String line = br.readLine();
             switch (line){
@@ -170,15 +185,22 @@ public class Main {
                 case "2":
                     userchoice = 2;
                     break;
+                case "3":
+                    userchoice = 3;
+                    break;
             }
             if(userchoice == 1){
                 WriteToFile(bookDetails() , myFile);
             } else if(userchoice == 2) {
-                if(Search()){
-                    System.out.println("This book is in the file");
-                }else{
-                    System.out.println("Book is not in the file");
-                }
+                System.out.println("Please input ISBN");
+                Scanner scanner = new Scanner(System.in);
+                String ISBN = scanner.next();
+                System.out.println(Search(myFile, ISBN));
+            } else if(userchoice == 3){
+                System.out.println("Please input ISBN");
+                Scanner scanner = new Scanner(System.in);
+                String ISBN = scanner.next();
+                EditBook(ISBN, myFile2);
             }
         }catch (InputMismatchException e){
             System.out.println(e);
@@ -204,15 +226,21 @@ public class Main {
         }
     }
 
-    public static boolean Search() throws IOException {
-        System.out.println("Please input ISBN");
-        Scanner scanner = new Scanner(System.in);
-        String ISBN = scanner.next();
-        if (ReadFile(ISBN, myFile)){
-            return true;
-        }else{
-            return false;
+    public static String Search(File fileToRead, String searchPara) throws IOException {
+        try {
+            Scanner myReader = new Scanner(fileToRead);
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                if(data.contains(searchPara)|| data.contains(searchPara)){
+                    return data;
+                }
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
+        return null;
     }
 
     public static void createFile(File fileName){
@@ -234,6 +262,25 @@ public class Main {
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void EditBook(String searchPara, File fileToReadFrom){
+        try {
+            Scanner myReader = new Scanner(fileToReadFrom);
+            FileWriter myWriter = new FileWriter(fileToReadFrom.getName(), false); //True means append to file contents
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                if(data.contains(searchPara)|| data.contains(searchPara)){
+                    myWriter.write(bookDetails());
+                }
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
